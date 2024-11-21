@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'detail_audio_page.dart';
 import 'my_home_page.dart';
 
 void main() {
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
+      // home: MyHomePage(),
+      home: DetailAudioPage(),
     );
   }
 }
