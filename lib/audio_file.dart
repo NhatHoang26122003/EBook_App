@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class AudioFile extends StatefulWidget {
   final  AudioPlayer advancedPlayer;
-  const AudioFile({super.key, required this.advancedPlayer});
+  final String audioPath;
+  const AudioFile({super.key, required this.advancedPlayer, required this.audioPath});
 
   @override
   State<AudioFile> createState() => _AudioFileState();
@@ -12,12 +13,10 @@ class AudioFile extends StatefulWidget {
 class _AudioFileState extends State<AudioFile> {
   Duration _duration = new Duration();
   Duration _position = new Duration();
-  final String path = "https://st.bslmeiyu.com/uploads/%E6%9C%97%E6%96%87%E5%9B%BD%E9%99%85SBS%E7%B3%BB%E5%88%97/"
-      "%E6%9C%97%E6%96%87%E5%9B%BD%E9%99%85%E8%8B%B1%E8%AF%AD%E6%95%99%E7%A8%8B%E7%AC%AC2%E5%86%8C"
-      "_V2/%E5%AD%A6%E7%94%9F%E7%94%A8%E4%B9%A6/P027_Side%20by%20Side%20Gazette%2001_2Build%20Your%20Vocabulary!.mp3";
   bool isPlaying = false;
   bool isPause = false;
-  bool isLoop = false;
+  bool isRepeat = false;
+  Color repeatColor = Colors.black;
   List<IconData> _icon = [
     Icons.play_circle_fill,
     Icons.pause_circle_filled,
@@ -35,7 +34,17 @@ class _AudioFileState extends State<AudioFile> {
         _position = p;
       });
     });
-    this. widget.advancedPlayer.setSource(UrlSource(path));
+    this. widget.advancedPlayer.setSource(UrlSource(this.widget.audioPath));
+    this.widget.advancedPlayer.onPlayerComplete.listen((event){
+      setState(() {
+        _position = Duration(seconds: 0);
+        if (isRepeat){
+          isPlaying = true;
+        } else {
+          isPlaying = false;
+        }
+      });
+    });
   }
   Widget btnStart() {
     return IconButton(
@@ -45,11 +54,56 @@ class _AudioFileState extends State<AudioFile> {
         if (isPlaying) {
           await widget.advancedPlayer.pause();
         } else {
-          await widget.advancedPlayer.play(UrlSource(path));
+          await widget.advancedPlayer.setSource(UrlSource(this.widget.audioPath));
+          await widget.advancedPlayer.resume();
         }
         setState(() {
           isPlaying = !isPlaying;
         });
+      },
+    );
+  }
+  Widget btnFast() {
+    return IconButton(
+      icon: Image.asset('img/forward.jpg',width: 15, height: 15),
+      onPressed: (){
+        this.widget.advancedPlayer.setPlaybackRate(1.5);
+      },
+    );
+  }
+  Widget btnSlow() {
+    return IconButton(
+      icon: Image.asset('img/backward.jpg',width: 15, height: 15),
+      onPressed: (){
+        this.widget.advancedPlayer.setPlaybackRate(0.75);
+      },
+    );
+  }
+  Widget btnShuffle() {
+    return IconButton(
+      icon: Image.asset('img/shuffle.jpg',width: 15, height: 15),
+      onPressed: (){
+      },
+    );
+  }
+  Widget btnRepeat() {
+    return IconButton(
+      // icon: Image.asset('img/repeat.jpg',width: 15, height: 15),
+      icon: Icon(Icons.repeat, size: 17, color: repeatColor,),
+      onPressed: (){
+        if (isRepeat){
+          this.widget.advancedPlayer.setReleaseMode(ReleaseMode.release);
+          setState(() {
+            repeatColor = Colors.black;
+            isRepeat = !isRepeat;
+          });
+        } else {
+          this.widget.advancedPlayer.setReleaseMode(ReleaseMode.loop);
+          setState(() {
+            repeatColor = Colors.blue;
+            isRepeat = !isRepeat;
+          });
+        }
       },
     );
   }
@@ -59,7 +113,11 @@ class _AudioFileState extends State<AudioFile> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          btnShuffle(),
+          btnSlow(),
           btnStart(),
+          btnFast(),
+          btnRepeat(),
         ],
       ),
     );

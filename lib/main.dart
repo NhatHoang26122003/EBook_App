@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       // home: MyHomePage(),
-      home: DetailAudioPage(),
+      home: MyHomePage(),
     );
   }
 }
